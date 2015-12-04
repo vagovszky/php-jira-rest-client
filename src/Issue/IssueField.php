@@ -142,6 +142,15 @@ class IssueField implements \JsonSerializable
     {
         return $this->issuetype;
     }
+    
+     /**
+     * Add custom field
+     * @param string $name
+     * @param mixed $value
+     */
+    public function addCustomField($name, $value){
+        $this->$name = $value;
+    }
 
     /** @var string */
     public $summary;

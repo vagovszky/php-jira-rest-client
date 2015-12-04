@@ -36,19 +36,6 @@ abstract class AbstractConfiguration implements ConfigurationInterface
      */
     protected $jiraPassword;
 
-    /**
-     * Path to log file
-     *
-     * @var string
-     */
-    protected $jiraLogFile;
-
-    /**
-     * Log level (DEBUG, INFO, ERROR, WARNING)
-     *
-     * @var string
-     */
-    protected $jiraLogLevel;
 
     /**
      * Curl options CURLOPT_SSL_VERIFYHOST
@@ -95,23 +82,7 @@ abstract class AbstractConfiguration implements ConfigurationInterface
         return $this->jiraPassword;
     }
 
-    /**
-     * @return string
-     */
-    public function getJiraLogFile()
-    {
-        return $this->jiraLogFile;
-    }
-
-    /**
-     * @return string
-     */
-    public function getJiraLogLevel()
-    {
-        return $this->jiraLogLevel;
-    }
-
-    /**
+       /**
      * @return boolean
      */
     public function isCurlOptSslVerifyHost()

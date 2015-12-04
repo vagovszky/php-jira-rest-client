@@ -36,20 +36,6 @@ interface ConfigurationInterface
     public function getJiraPassword();
 
     /**
-     * Path to log file
-     *
-     * @return string
-     */
-    public function getJiraLogFile();
-
-    /**
-     * Log level (DEBUG, INFO, ERROR, WARNING)
-     *
-     * @return string
-     */
-    public function getJiraLogLevel();
-
-    /**
      * Curl options CURLOPT_SSL_VERIFYHOST
      *
      * @return boolean

@@ -2,9 +2,6 @@
 namespace JiraRestApi;
 
 use JiraRestApi\Configuration\ConfigurationInterface;
-use JiraRestApi\Configuration\DotEnvConfiguration;
-use Monolog\Logger as Logger;
-use Monolog\Handler\StreamHandler;
 
 /**
  * Interact jira server with REST API.
@@ -40,13 +37,6 @@ class JiraClient
     protected $curl;
 
     /**
-     * Monolog instance
-     *
-     * @var \Monolog\Logger
-     */
-    protected $log;
-
-    /**
      * Jira Rest API Configuration
      *
      * @var ConfigurationInterface
@@ -67,35 +57,7 @@ class JiraClient
         $this->configuration = $configuration;
         $this->json_mapper = new \JsonMapper();
 
-        // create logger
-        $this->log = new Logger('JiraClient');
-        $this->log->pushHandler(new StreamHandler(
-            $configuration->getJiraLogFile(),
-            $this->convertLogLevel($configuration->getJiraLogLevel())
-        ));
-
         $this->http_response = 200;
-    }
-
-    /**
-     * Convert log level
-     *
-     * @param $log_level
-     *
-     * @return int
-     */
-    private function convertLogLevel($log_level)
-    {
-        switch ($log_level) {
-            case 'DEBUG':
-                return Logger::DEBUG;
-            case 'INFO':
-                return Logger::INFO;
-            case 'ERROR':
-                return Logger::ERROR;
-            default:
-                return Logger::WARNING;
-        }
     }
 
     /**
@@ -136,8 +98,6 @@ class JiraClient
     {
         $url = $this->createUrlByContext($context);
 
-        $this->log->addDebug("Curl $url JsonData=" . $post_data);
-
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $url);
@@ -168,7 +128,6 @@ class JiraClient
 
         curl_setopt($ch, CURLOPT_VERBOSE, $this->getConfiguration()->isCurlOptVerbose());
 
-        $this->log->addDebug('Curl exec='.$url);
         $response = curl_exec($ch);
 
         // if request failed.
@@ -183,7 +142,6 @@ class JiraClient
             }
 
             // HostNotFound, No route to Host, etc Network error
-            $this->log->addError('CURL Error: = '.$body);
             throw new JiraException('CURL Error: = '.$body);
         } else {
             // if request was ok, parsing http response code.
@@ -226,7 +184,6 @@ class JiraClient
             curl_setopt($ch, CURLOPT_POSTFIELDS,
                 array('file' => '@'.$attachments.';filename='.$filename));
 
-            $this->log->addDebug('using legacy file upload');
         } else {
             // CURLFile require PHP > 5.5
             $attachments = new \CURLFile(realpath($upload_file));
@@ -235,7 +192,6 @@ class JiraClient
             curl_setopt($ch, CURLOPT_POSTFIELDS,
                     array('file' => $attachments));
 
-            $this->log->addDebug('using CURLFile='.var_export($attachments, true));
         }
 
         $this->authorization($ch);
@@ -252,8 +208,6 @@ class JiraClient
                 ));
 
         curl_setopt($ch, CURLOPT_VERBOSE, $this->getConfiguration()->isCurlOptVerbose());
-
-        $this->log->addDebug('Curl exec='.$url);
 
         return $ch;
     }
@@ -314,7 +268,6 @@ class JiraClient
                 // HostNotFound, No route to Host, etc Network error
                 $result_code = -1;
                 $body = 'CURL Error: = '.$body;
-                $this->log->addError($body);
             } else {
                 // if request was ok, parsing http response code.
                 $result_code = $this->http_response = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -324,7 +277,6 @@ class JiraClient
                     $body = 'CURL HTTP Request Failed: Status Code : '
                      .$this->http_response.', URL:'.$url
                      ."\nError Message : ".$response; // @TODO undefined variable $response
-                    $this->log->addError($body);
                 }
             }
         }
@@ -332,11 +284,9 @@ class JiraClient
         // clean up
 end:
         foreach ($chArr as $ch) {
-            $this->log->addDebug('CURL Close handle..');
             curl_close($ch);
             curl_multi_remove_handle($mh, $ch);
         }
-        $this->log->addDebug('CURL Multi Close handle..');
         curl_multi_close($mh);
         if ($result_code != 200) {
             // @TODO $body might have not been defined

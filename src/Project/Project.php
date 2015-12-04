@@ -2,7 +2,7 @@
 
 namespace JiraRestApi\Project;
 
-class Project
+class Project implements \JsonSerializable
 {
     /**
      * return only if Project query by key(not id).
@@ -73,4 +73,10 @@ class Project
 
       /* @var array */
      public $roles;
+     
+    public function jsonSerialize()
+    {
+        return array_filter(get_object_vars($this));
+    }
+     
 }

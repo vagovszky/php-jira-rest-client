@@ -2,7 +2,7 @@
 
 namespace JiraRestApi\Project;
 
-class Component
+class Component implements \JsonSerializable
 {
     /**
      * Component URI.
@@ -31,4 +31,9 @@ class Component
      * @var description
      */
     public $description;
+    
+    public function jsonSerialize()
+    {
+        return array_filter(get_object_vars($this));
+    }
 }

@@ -35,8 +35,6 @@ class ProjectService extends \JiraRestApi\JiraClient
     {
         $ret = $this->exec($this->uri."/$projectIdOrKey", null);
 
-        $this->log->addInfo('Result='.$ret);
-
         $prj = $this->json_mapper->map(
              json_decode($ret), new Project()
         );

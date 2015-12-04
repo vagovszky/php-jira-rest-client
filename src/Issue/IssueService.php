@@ -15,8 +15,6 @@ class IssueService extends \JiraRestApi\JiraClient
     {
         $ret = $this->exec($this->uri."/$issueIdOrKey", null);
 
-        $this->log->addInfo("Result=\n".$ret);
-
         $issue = $this->json_mapper->map(
              json_decode($ret), new Issue()
         );
@@ -40,8 +38,6 @@ class IssueService extends \JiraRestApi\JiraClient
 
         $data = json_encode($issue);
 
-        $this->log->addInfo("Create Issue=\n".$data);
-
         $ret = $this->exec($this->uri, $data, 'POST');
 
         $issue = $this->json_mapper->map(
@@ -62,8 +58,6 @@ class IssueService extends \JiraRestApi\JiraClient
     public function addAttachments($issueIdOrKey, $filePathArray)
     {
         $results = $this->upload($this->uri."/$issueIdOrKey/attachments", $filePathArray);
-
-        $this->log->addInfo('addAttachments result='.var_export($results, true));
 
         $resArr = array();
         foreach ($results as $ret) {
@@ -95,8 +89,6 @@ class IssueService extends \JiraRestApi\JiraClient
 
         $data = json_encode($issue);
 
-        $this->log->addInfo("Update Issue=\n".$data);
-
         $ret = $this->exec($this->uri."/$issueIdOrKey", $data, 'PUT');
 
         return $ret;
@@ -112,13 +104,10 @@ class IssueService extends \JiraRestApi\JiraClient
      */
     public function addComment($issueIdOrKey, $comment)
     {
-        $this->log->addInfo("addComment=\n");
-
         $data = json_encode($comment);
 
         $ret = $this->exec($this->uri."/$issueIdOrKey/comment", $data);
 
-        $this->log->addDebug('add comment result='.var_export($ret, true));
         $comment = $this->json_mapper->map(
            json_decode($ret), new Comment()
         );
@@ -137,8 +126,6 @@ class IssueService extends \JiraRestApi\JiraClient
     {
         $ret = $this->exec($this->uri."/$issueIdOrKey/transitions");
 
-        $this->log->addDebug('getTransitions result='.var_export($ret, true));
-
         $data = json_encode(json_decode($ret)->transitions);
 
         $transitions = $this->json_mapper->mapArray(
@@ -153,14 +140,11 @@ class IssueService extends \JiraRestApi\JiraClient
      */
     public function findTransitonId($issueIdOrKey, $transitionToName)
     {
-        $this->log->addDebug('findTransitonId=');
 
         $ret = $this->getTransition($issueIdOrKey);
 
         foreach ($ret as $trans) {
             $toName = $trans->to->name;
-
-            $this->log->addDebug('getTransitions result='.var_export($ret, true));
 
             if (strcmp($toName, $transitionToName) == 0) {
                 return $trans->id;
@@ -179,7 +163,6 @@ class IssueService extends \JiraRestApi\JiraClient
      */
     public function transition($issueIdOrKey, $transition)
     {
-        $this->log->addDebug('transition='.var_export($transition, true));
 
         if (!isset($transition->transition['id'])) {
             $transition->transition['id'] = $this->findTransitonId($issueIdOrKey, $transition->transition['name']);
@@ -187,11 +170,8 @@ class IssueService extends \JiraRestApi\JiraClient
 
         $data = json_encode($transition);
 
-        $this->log->addDebug("transition req=$data\n");
-
         $ret = $this->exec($this->uri."/$issueIdOrKey/transitions", $data, 'POST');
 
-        $this->log->addDebug('getTransitions result='.var_export($ret, true));
     }
 
     /**
@@ -231,7 +211,6 @@ class IssueService extends \JiraRestApi\JiraClient
     public function getTimeTracking($issueIdOrKey)
     {
         $ret = $this->exec($this->uri . "/$issueIdOrKey", null);
-        $this->log->addDebug("getTimeTracking res=$ret\n");
 
         $issue = $this->json_mapper->map(
              json_decode($ret), new Issue()
@@ -260,8 +239,6 @@ class IssueService extends \JiraRestApi\JiraClient
 
         $data = json_encode($array);
 
-        $this->log->addDebug("TimeTracking req=$data\n");
-
         // if success, just return HTTP 201.
         $ret = $this->exec($this->uri . "/$issueIdOrKey", $data, 'PUT');
 
@@ -277,7 +254,6 @@ class IssueService extends \JiraRestApi\JiraClient
     public function getWorklog($issueIdOrKey)
     {
         $ret = $this->exec($this->uri . "/$issueIdOrKey/worklog");
-        $this->log->addDebug("getWorklog res=$ret\n");
         $worklog = $this->json_mapper->map(
             json_decode($ret), new Worklog()
         );
