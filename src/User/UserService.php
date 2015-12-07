@@ -55,7 +55,7 @@ class UserService extends \JiraRestApi\JiraClient
      */
     public function addUserToProjectRole(User $user, Project $project, Role $role){
         
-        $data = (object) ["user" => $user->name];
+        $data = json_encode((object) ["user" => [$user->name]]);
         
         $projectKey = $project->key;
         $roleId = $role->id;
