@@ -4,42 +4,153 @@ namespace JiraRestApi\Issue;
 
 class IssueField implements \JsonSerializable
 {
-    public function __construct($updateIssue = false)
-    {
-        if ($updateIssue != true) {
-            $this->project = new \JiraRestApi\Project\Project();
+    
+    /** @var string */
+    public $summary;
 
-            $this->assignee = new \JiraRestApi\Issue\Reporter();
-            $this->priority = new \JiraRestApi\Issue\Priority();
-            $this->versions = array();
+    /** @var array */
+    public $progress;
 
-            $this->issuetype = new \JiraRestApi\Issue\IssueType();
-        }
-    }
+    /** @var TimeTracking */
+    public $timeTracking;
 
-    public function jsonSerialize()
-    {
-        return array_filter(get_object_vars($this));
-    }
+    /** @var IssueType */
+    public $issuetype;
+
+    /** @var string */
+    public $timespent;
+
+    /** @var Reporter */
+    public $reporter;
+
+    /** @var \DateTime */
+    public $created;
+
+    /** @var \DateTime */
+    public $updated;
+
+    /** @var string */
+    public $description;
+
+    /** @var Priority */
+    public $priority;
+
+    /** @var object */
+    public $status;
+
+    /** @var array */
+    public $labels;
+
+    /** @var \JiraRestApi\Project\Project */
+    public $project;
+
+    /** @var string */
+    public $environment;
+
+    /** @var array */
+    public $components;
+
+    /** @var Comments */
+    public $comments;
+
+    /** @var object */
+    public $votes;
+
+    /** @var object */
+    public $resolution;
+
+    /** @var array */
+    public $fixVersions;
+
+    /** @var Reporter */
+    public $creator;
+
+    /** @var object */
+    public $watches;
+
+    /** @var object */
+    public $worklog;
+
+    /** @var Reporter */
+    public $assignee;
+
+    /** @var \JiraRestApi\Issue\Version[] */
+    public $versions;
+
+    /** @var \JiraRestApi\Issue\Attachment[] */
+    public $attachments;
+
+    /** @var  string */
+    public $aggregatetimespent;
+
+    /** @var  string */
+    public $timeestimate;
+
+    /** @var  string */
+    public $aggregatetimeoriginalestimate;
+
+    /** @var  string */
+    public $resolutiondate;
+
+    /** @var \DateTime */
+    public $duedate;
+
+    /** @var array */
+    public $issuelinks;
+
+    /** @var array */
+    public $subtasks;
+
+    /** @var int */
+    public $workratio;
+
+    /** @var object */
+    public $aggregatetimeestimate;
+
+    /** @var object */
+    public $aggregateprogress;
+
+    /** @var object */
+    public $lastViewed;
+
+    /** @var object */
+    public $timeoriginalestimate;
+    
 
     public function getProjectKey()
     {
+        if (is_null($this->project)) {
+            $this->project = new \JiraRestApi\Project\Project();
+        }
+        
         return $this->project->key;
     }
 
     public function getProjectId()
     {
+        if (is_null($this->project)) {
+            $this->project = new \JiraRestApi\Project\Project();
+        }
+        
         return $this->project->id;
     }
 
     public function setProjectKey($key)
     {
+        if (is_null($this->project)) {
+            $this->project = new \JiraRestApi\Project\Project();
+        }
+        
         $this->project->key = $key;
 
         return $this;
     }
     public function setProjectId($id)
     {
+        if (is_null($this->project)) {
+            $this->project = new \JiraRestApi\Project\Project();
+        }
+        
         $this->project->id = $id;
 
         return $this;
@@ -152,115 +263,9 @@ class IssueField implements \JsonSerializable
         $this->$name = $value;
     }
 
-    /** @var string */
-    public $summary;
-
-    /** @var array */
-    public $progress;
-
-    /** @var TimeTracking */
-    public $timeTracking;
-
-    /** @var IssueType */
-    public $issuetype;
-
-    /** @var string */
-    public $timespent;
-
-    /** @var Reporter */
-    public $reporter;
-
-    /** @var \DateTime */
-    public $created;
-
-    /** @var \DateTime */
-    public $updated;
-
-    /** @var string */
-    public $description;
-
-    /** @var Priority */
-    public $priority;
-
-    /** @var object */
-    public $status;
-
-    /** @var array */
-    public $labels;
-
-    /** @var \JiraRestApi\Project\Project */
-    public $project;
-
-    /** @var string */
-    public $environment;
-
-    /** @var array */
-    public $components;
-
-    /** @var Comments */
-    public $comments;
-
-    /** @var object */
-    public $votes;
-
-    /** @var object */
-    public $resolution;
-
-    /** @var array */
-    public $fixVersions;
-
-    /** @var Reporter */
-    public $creator;
-
-    /** @var object */
-    public $watches;
-
-    /** @var object */
-    public $worklog;
-
-    /** @var Reporter */
-    public $assignee;
-
-    /** @var \JiraRestApi\Issue\Version[] */
-    public $versions;
-
-    /** @var \JiraRestApi\Issue\Attachment[] */
-    public $attachments;
-
-    /** @var  string */
-    public $aggregatetimespent;
-
-    /** @var  string */
-    public $timeestimate;
-
-    /** @var  string */
-    public $aggregatetimeoriginalestimate;
-
-    /** @var  string */
-    public $resolutiondate;
-
-    /** @var \DateTime */
-    public $duedate;
-
-    /** @var array */
-    public $issuelinks;
-
-    /** @var array */
-    public $subtasks;
-
-    /** @var int */
-    public $workratio;
-
-    /** @var object */
-    public $aggregatetimeestimate;
-
-    /** @var object */
-    public $aggregateprogress;
-
-    /** @var object */
-    public $lastViewed;
-
-    /** @var object */
-    public $timeoriginalestimate;
-
+    
+    public function jsonSerialize()
+    {
+        return array_filter(get_object_vars($this));
+    }
 }
