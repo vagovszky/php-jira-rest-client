@@ -48,12 +48,8 @@ class JiraClient
      *
      * @param ConfigurationInterface $configuration
      */
-    public function __construct(ConfigurationInterface $configuration = null)
+    public function __construct(ConfigurationInterface $configuration)
     {
-        if ($configuration === null) {
-            $configuration = new DotEnvConfiguration('.');
-        }
-
         $this->configuration = $configuration;
         $this->json_mapper = new \JsonMapper();
 
