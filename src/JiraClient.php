@@ -97,6 +97,9 @@ class JiraClient
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_URL, $url);
+        
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $this->getConfiguration()->getCurlConnectionTimeout());
+        curl_setopt($ch, CURLOPT_TIMEOUT, $this->getConfiguration()->getCurlTimeout());
 
         // post_data
         if (!is_null($post_data)) {
@@ -119,9 +122,8 @@ class JiraClient
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $this->getConfiguration()->isCurlOptSslVerifyPeer());
 
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER,
-            array('Accept: */*', 'Content-Type: application/json'));
-
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: */*', 'Content-Type: application/json'));
+        
         curl_setopt($ch, CURLOPT_VERBOSE, $this->getConfiguration()->isCurlOptVerbose());
 
         $response = curl_exec($ch);

@@ -55,4 +55,16 @@ interface ConfigurationInterface
      * @return boolean
      */
     public function isCurlOptVerbose();
+    
+    /**
+     * Curl option CURLOPT_CONNECTTIMEOUT
+     * return int
+     */
+    public function getCurlConnectionTimeout();
+    
+    /**
+     * Curl option CURLOPT_TIMEOUT 
+     */
+    public function getCurlTimeout();
+    
 }

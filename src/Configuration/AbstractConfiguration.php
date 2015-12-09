@@ -42,21 +42,32 @@ abstract class AbstractConfiguration implements ConfigurationInterface
      *
      * @var boolean
      */
-    protected $curlOptSslVerifyHost;
+    protected $curlOptSslVerifyHost = false;
 
     /**
      * Curl options CURLOPT_SSL_VERIFYPEER
      *
      * @var boolean
      */
-    protected $curlOptSslVerifyPeer;
+    protected $curlOptSslVerifyPeer = false;
 
     /**
      * Curl options CURLOPT_VERBOSE
      *
      * @var boolean
      */
-    protected $curlOptVerbose;
+    protected $curlOptVerbose = false;
+    
+    /**
+     * Curl option CURLOPT_CONNECTTIMEOUT
+     * return int
+     */
+    protected $curlConnectionTimeout = 8;
+    
+    /**
+     * Curl option CURLOPT_TIMEOUT 
+     */
+    protected $curlTimeout = 12;
 
     /**
      * @return string
@@ -104,5 +115,20 @@ abstract class AbstractConfiguration implements ConfigurationInterface
     public function isCurlOptVerbose()
     {
         return $this->curlOptVerbose;
+    }
+    
+    /**
+     * Curl option CURLOPT_CONNECTTIMEOUT
+     * return int
+     */
+    public function getCurlConnectionTimeout(){
+        return $this->curlConnectionTimeout;
+    }
+    
+    /**
+     * Curl option CURLOPT_TIMEOUT 
+     */
+    public function getCurlTimeout(){
+        return $this->curlTimeout;
     }
 }
