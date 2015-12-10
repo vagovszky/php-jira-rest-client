@@ -3,9 +3,15 @@
     "description": "JIRA REST API Client for PHP Users.",
     "type": "library",
     "keywords": ["jira", "rest", "jira-php", "jira-rest"],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/vagovszky/jsonmapper"
+        }
+    ],
     "require": {
         "php": ">=5.4.0",
-        "netresearch/jsonmapper": "~0.5"
+        "vagovszky/jsonmapper": "dev-development"
     },
     "license": "Apache 2.0",
     "authors": [
