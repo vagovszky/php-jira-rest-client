@@ -11,7 +11,7 @@
     ],
     "require": {
         "php": ">=5.4.0",
-        "vagovszky/jsonmapper": "dev-development"
+        "vagovszky/jsonmapper": "1.0.0"
     },
     "license": "Apache 2.0",
     "authors": [
@@ -30,6 +30,5 @@
         "psr-4" : {
             "JiraRestApi\\" : "src"
         }
-    },
-    "minimum-stability": "dev"
+    }
 }
