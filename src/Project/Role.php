@@ -1,9 +1,5 @@
 <?php
 
-/**
- * @author E351649
- */
-
 namespace JiraRestApi\Project;
 
 class Role implements \JsonSerializable {

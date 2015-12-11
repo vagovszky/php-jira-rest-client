@@ -1,9 +1,5 @@
 <?php
 
-/**
- * @author E351649
- */
-
 namespace JiraRestApi\User;
 
 class User implements \JsonSerializable
@@ -29,6 +25,9 @@ class User implements \JsonSerializable
     
     /* @var string */
     public $notification;
+    
+    /* @var boolean */
+    public $active;
 
     public function jsonSerialize()
     {
