@@ -17,7 +17,7 @@ class UserService extends \JiraRestApi\JiraClient
      */
     public function get($username)
     {
-        $ret = $this->exec($this->uri."?username=".urlencode($username), null);
+        $ret = $this->exec($this->uri . "?username=" . urlencode($username), null);
 
         $user = $this->json_mapper->map(
              json_decode($ret), new User()
@@ -76,12 +76,10 @@ class UserService extends \JiraRestApi\JiraClient
      */
     public function deleteUserFromProjectRole(User $user, Project $project, Role $role){
         
-        $data = json_encode((object) ["user" => [$user->name]]);
-        
         $projectKey = $project->key;
         $roleId = $role->id;
         
-        $ret = $this->exec("/project/$projectKey/role/$roleId", $data, 'DELETE');
+        $ret = $this->exec("/project/$projectKey/role/$roleId?user=" . urlencode($user->name), true, 'DELETE');
         
         return $ret;
         
@@ -115,12 +113,7 @@ class UserService extends \JiraRestApi\JiraClient
     public function deleteUserFromGroup(User $user, Group $group){
                 
         $ret = $this->exec("/group/user?groupname=" . urlencode($group->name) . "&username=" . urlencode($user->name), true, 'DELETE');
-        
-        $group = $this->json_mapper->map(
-             json_decode($ret), new Group()
-        );
-        
-        return $group;
+
+        return $ret;
     }
 }
-

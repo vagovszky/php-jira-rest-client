@@ -133,9 +133,9 @@ class JiraClient
             $this->http_response = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             $body = curl_error($ch);
             curl_close($ch);
-
+            
             //The server successfully processed the request, but is not returning any content.
-            if ($this->http_response == 204) {
+            if (($this->http_response == 200) || ($this->http_response == 201) || ($this->http_response == 204)) {
                 return '';
             }
 
@@ -145,13 +145,18 @@ class JiraClient
             // if request was ok, parsing http response code.
             $this->http_response = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-            curl_close($ch);
-
             // don't check 301, 302 because setting CURLOPT_FOLLOWLOCATION
             if ($this->http_response != 200 && $this->http_response != 201) {
-                throw new JiraException('CURL HTTP Request Failed: Status Code : '
-                 .$this->http_response.', URL:'.$url
-                 ."\nError Message : ".$response, $this->http_response);
+                $body = curl_error($ch);
+                curl_close($ch);
+                $err_message  = 'CURL HTTP Request Failed : \n';
+                $err_message .= 'Status Code : '.$this->http_response.'\n';
+                $err_message .= 'URL : '.$url.'\n';
+                $err_message .= 'Error Message : '.$response.'\n';
+                $err_message .= 'CURL Error : '.$body.'\n';
+                throw new JiraException($err_message, $this->http_response);
+            }else{
+                curl_close($ch);
             }
         }
 
