@@ -11,7 +11,7 @@ class Group implements \JsonSerializable
     /* @var string */
     public $name;
 
-    /* @var \JiraRestApi\User\Users */
+    /* @var \stdclass */
     public $users;
     
     /* @var string */
