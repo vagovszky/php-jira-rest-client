@@ -52,6 +52,8 @@ class JiraClient
     {
         $this->configuration = $configuration;
         $this->json_mapper = new \JsonMapper();
+        
+        $this->json_mapper->createMissingProperties = $this->getConfiguration()->canMapMissingProperties();
 
         $this->http_response = 200;
     }
