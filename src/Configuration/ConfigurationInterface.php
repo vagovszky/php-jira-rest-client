@@ -67,10 +67,4 @@ interface ConfigurationInterface
      */
     public function getCurlTimeout();
     
-    
-    /**
-     * Can missing properties be mapped onto existing objects
-     */
-    public function canMapMissingProperties();
-    
 }

@@ -116,7 +116,40 @@ class IssueField implements \JsonSerializable
     /** @var object */
     public $timeoriginalestimate;
     
-
+    /** @var object */
+    public $customfields = [];
+    
+    
+    public function __set($name, $value) {
+        if (is_numeric($name)){
+            $this->customfields['customfield_'.$name] = $value;
+        }else{
+            $this->customfields[$name] = $value;
+        }
+    }
+    
+    public function __get($name) {
+        if(is_numeric($name)){
+            $ret = isset($this->customfields['customfield_'.$name]) ? $this->customfields['customfield_'.$name] : null;
+        }else{
+            $ret = isset($this->customfields[$name]) ? $this->customfields[$name] : null;
+        }
+        return $ret;
+    }
+    
+    public function __isset($name) {
+        if(is_numeric($name)){
+            $ret = isset($this->customfields['customfield_'.$name]);
+        }else{
+            $ret = isset($this->customfields[$name]);
+        }
+        return $ret;
+    }
+    
+    public function getCustomFields() {
+        return $this->customfields;
+    }
+    
     public function getProjectKey()
     {
         if (is_null($this->project)) {
@@ -266,6 +299,16 @@ class IssueField implements \JsonSerializable
     
     public function jsonSerialize()
     {
-        return array_filter(get_object_vars($this));
+       $ret = array_filter(get_object_vars($this));
+       
+       if (isset($ret['customfields']))
+       {
+           foreach ($ret['customfields'] as $key => $val) {
+               $ret[$key] = $val;
+           }
+           unset($ret['customfields']);
+       }
+       
+       return $ret;
     }
 }

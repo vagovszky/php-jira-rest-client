@@ -13,6 +13,4 @@ namespace JiraRestApi;
  *
  * @package JiraRestApi
  */
-class JiraException extends \Exception
-{
-}
+class JiraException extends \Exception {}

@@ -2,30 +2,11 @@
 
 /**
  * @author E351649
+ * This class exists because of backward compatibility <= 1.0.4
  */
 
 namespace JiraRestApi\Issue;
 
-class CustomFieldOption implements \JsonSerializable{
-    
-    /**
-     * @var string
-     */
-    public $id;
-    
-    /**
-     * @var string
-     */
-    public $name;
-    
-    /**
-     * @var string
-     */
-    public $value;
-    
-    public function jsonSerialize()
-    {
-        return array_filter(get_object_vars($this));
-    }
-    
-}
+use JiraRestApi\Issue\CustomFieldValue;
+
+class CustomFieldOption extends CustomFieldValue {}

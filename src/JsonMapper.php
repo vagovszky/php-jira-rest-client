@@ -27,14 +27,6 @@ use JiraRestApi\JiraException;
  */
 class JsonMapper
 {
-    /**
-     * PSR-3 compatible logger object
-     *
-     * @link http://www.php-fig.org/psr/psr-3/
-     * @var  object
-     * @see  setLogger()
-     */
-    protected $logger;
 
     /**
      * Throw an exception when JSON data contain a property
@@ -71,24 +63,15 @@ class JsonMapper
     protected $arInspectedClasses = array();
 
     /**
-     * Create new properies at runtime
-     * @TODO: To be implemented
-     * @var boolean
-     */
-    public $createMissingProperties = false;
-    
-    /**
-     * Map data all data in $json into the given $object instance.
-     *
-     * @param object $json   JSON object structure from json_decode()
-     * @param object $object Object to map $json data into
-     *
-     * @return object Mapped object is returned.
-     * @see    mapArray()
-     */
+    * Mapowanie jsona do obiektu
+    *
+    * @param json $json
+    * @param object $object
+    * @return $object
+    */
     public function map($json, $object)
     {
-        if ($this->bEnforceMapType && !is_object($json)) {
+         if ($this->bEnforceMapType && !is_object($json)) {
             throw new JiraException(
                 'JsonMapper::map() requires first argument to be an object'
                 . ', ' . gettype($json) . ' given.'
@@ -100,24 +83,21 @@ class JsonMapper
                 . ', ' . gettype($object) . ' given.'
             );
         }
-
+        
         $strClassName = get_class($object);
         $rc = new \ReflectionClass($object);
         $strNs = $rc->getNamespaceName();
         $providedProperties = array();
         foreach ($json as $key => $jvalue) {
             $providedProperties[$key] = true;
-
             // Store the property inspection results so we don't have to do it
             // again for subsequent objects of the same type
             if (!isset($this->arInspectedClasses[$strClassName][$key])) {
                 $this->arInspectedClasses[$strClassName][$key]
                     = $this->inspectProperty($rc, $key);
             }
-
             list($hasProperty, $accessor, $type)
                 = $this->arInspectedClasses[$strClassName][$key];
-
             if (!$hasProperty) {
                 if ($this->bExceptionOnUndefinedProperty) {
                     throw new JiraException(
@@ -125,14 +105,9 @@ class JsonMapper
                         . ' in object of type ' . $strClassName
                     );
                 }
-                $this->log(
-                    'info',
-                    'Property {property} does not exist in {class}',
-                    array('property' => $key, 'class' => $strClassName)
-                );
+                
                 continue;
             }
-
             if ($accessor === null) {
                 if ($this->bExceptionOnUndefinedProperty) {
                     throw new JiraException(
@@ -140,14 +115,9 @@ class JsonMapper
                         . ' in object of type ' . $strClassName
                     );
                 }
-                $this->log(
-                    'info',
-                    'Property {property} has no public setter method in {class}',
-                    array('property' => $key, 'class' => $strClassName)
-                );
+                
                 continue;
             }
-
             if ($this->isNullable($type)) {
                 if ($jvalue === null) {
                     $this->setProperty($object, $accessor, null);
@@ -155,7 +125,6 @@ class JsonMapper
                 }
                 $type = $this->removeNullable($type);
             }
-
             if ($type === null || $type === 'mixed') {
                 //no given type - simply set the json data
                 $this->setProperty($object, $accessor, $jvalue);
@@ -168,7 +137,6 @@ class JsonMapper
                 $this->setProperty($object, $accessor, $jvalue);
                 continue;
             }
-
             //FIXME: check if type exists, give detailled error message if not
             if ($type === '') {
                 throw new JiraException(
@@ -176,7 +144,6 @@ class JsonMapper
                     . $strClassName . '::$' . $key . '"'
                 );
             }
-
             $array = null;
             $subtype = null;
             if (substr($type, -2) == '[]') {
@@ -194,7 +161,6 @@ class JsonMapper
             ) {
                 $array = $this->createInstance($type);
             }
-
             if ($array !== null) {
                 if (!$this->isSimpleType($subtype)) {
                     $subtype = $this->getFullNamespace($subtype, $strNs);
@@ -220,11 +186,9 @@ class JsonMapper
             }
             $this->setProperty($object, $accessor, $child);
         }
-
         if ($this->bExceptionOnMissingData) {
             $this->checkMissingData($providedProperties, $rc);
         }
-
         return $object;
     }
 
@@ -331,6 +295,25 @@ class JsonMapper
      */
     protected function inspectProperty(\ReflectionClass $rc, $name)
     {
+        $ret = $this->inspectPropertyDeeply($rc, $name);
+        if ($ret[0] === false) {
+            if ($rc->hasMethod('__set'))
+            {
+                $a = $rc->getMethod('__set');
+                return [true, new ReflectionContainer($a, $name), 'mixed'];
+            }
+        }
+        return $ret;
+    }
+    
+    /**
+     * Internal property inspector
+     * @param \ReflectionClass $rc
+     * @param string $name
+     * @return array
+     */
+    private function inspectPropertyDeeply(\ReflectionClass $rc, $name)
+    {
         //try setter method first
         $setter = 'set' . str_replace(
             ' ', '', ucwords(str_replace('_', ' ', $name))
@@ -407,13 +390,17 @@ class JsonMapper
      *
      * @return void
      */
-    protected function setProperty(
-        $object, $accessor, $value
-    ) {
+    protected function setProperty($object, $accessor, $value) {
+        
         if ($accessor instanceof \ReflectionProperty) {
             $object->{$accessor->getName()} = $value;
         } else {
-            $object->{$accessor->getName()}($value);
+            if ($accessor instanceof ReflectionContainer)
+            {
+                $object->{$accessor->getName()}($accessor->getField(), $value);
+            }
+            else
+                $object->{$accessor->getName()}($value);
         }
     }
 
@@ -541,32 +528,26 @@ class JsonMapper
         return $annotations;
     }
 
-    /**
-     * Log a message to the $logger object
-     *
-     * @param string $level   Logging level
-     * @param string $message Text to log
-     * @param array  $context Additional information
-     *
-     * @return null
-     */
-    protected function log($level, $message, array $context = array())
-    {
-        if ($this->logger) {
-            $this->logger->log($level, $message, $context);
-        }
-    }
+}
 
-    /**
-     * Sets a logger instance on the object
-     *
-     * @param LoggerInterface $logger PSR-3 compatible logger object
-     *
-     * @return null
-     */
-    public function setLogger($logger)
+class ReflectionContainer
+{
+    protected $ref = null;
+    protected $field = null;
+    
+    public function __construct($reflection, $field)
     {
-        $this->logger = $logger;
+        $this->ref = $reflection;
+        $this->field = $field;
+    }
+    
+    public function getName() {
+        return $this->ref->getName();
+    }
+    
+    public function getField() {
+        return $this->field;
     }
 }
+
 ?>

@@ -69,11 +69,6 @@ abstract class AbstractConfiguration implements ConfigurationInterface
      */
     protected $curlTimeout = 12;
     
-    /**
-     * Can missing properties be mapped onto existing objects
-     * @var boolean 
-     */
-    protected $mapMissingProperties = false;
 
     /**
      * @return string
@@ -136,13 +131,5 @@ abstract class AbstractConfiguration implements ConfigurationInterface
      */
     public function getCurlTimeout(){
         return $this->curlTimeout;
-    }
-    
-    /**
-     * Can missing properties be mapped onto existing objects
-     * @return boolean 
-     */
-    public function canMapMissingProperties(){
-        return $this->mapMissingProperties;
     }
 }
