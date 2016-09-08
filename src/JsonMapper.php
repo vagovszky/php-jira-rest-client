@@ -3,9 +3,10 @@
 namespace JiraRestApi;
 
 use JiraRestApi\JiraException;
+use JiraRestApi\ReflectionContainer;
 
 /**
- * Part of JsonMapper
+ * Part of JsonMapper - HACKED BY E351649
  *
  * PHP version 5
  *
@@ -282,37 +283,12 @@ class JsonMapper
     }
 
     /**
-     * Try to find out if a property exists in a given class.
-     * Checks property first, falls back to setter method.
-     *
-     * @param object $rc   Reflection class to check
-     * @param string $name Property name
-     *
-     * @return array First value: if the property exists
-     *               Second value: the accessor to use (
-     *                 ReflectionMethod or ReflectionProperty, or null)
-     *               Third value: type of the property
-     */
-    protected function inspectProperty(\ReflectionClass $rc, $name)
-    {
-        $ret = $this->inspectPropertyDeeply($rc, $name);
-        if ($ret[0] === false) {
-            if ($rc->hasMethod('__set'))
-            {
-                $a = $rc->getMethod('__set');
-                return [true, new ReflectionContainer($a, $name), 'mixed'];
-            }
-        }
-        return $ret;
-    }
-    
-    /**
      * Internal property inspector
      * @param \ReflectionClass $rc
      * @param string $name
      * @return array
      */
-    private function inspectPropertyDeeply(\ReflectionClass $rc, $name)
+    private function inspectProperty(\ReflectionClass $rc, $name)
     {
         //try setter method first
         $setter = 'set' . str_replace(
@@ -374,7 +350,12 @@ class JsonMapper
             }
         }
 
-        //no setter, no property
+        if ($rc->hasMethod('__set'))
+        {
+            $a = $rc->getMethod('__set');
+                return array(true, new ReflectionContainer($a, $name), 'mixed');
+        }
+        
         return array(false, null, null);
     }
 
@@ -528,26 +509,6 @@ class JsonMapper
         return $annotations;
     }
 
-}
-
-class ReflectionContainer
-{
-    protected $ref = null;
-    protected $field = null;
-    
-    public function __construct($reflection, $field)
-    {
-        $this->ref = $reflection;
-        $this->field = $field;
-    }
-    
-    public function getName() {
-        return $this->ref->getName();
-    }
-    
-    public function getField() {
-        return $this->field;
-    }
 }
 
 ?>
